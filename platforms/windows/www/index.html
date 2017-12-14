@@ -1,0 +1,26 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+    $("button").click(function()
+    {
+    	$.getJSON('https://sonalib.000webhostapp.com/index.php?rw_app_id=' + $('#hrmsID').val(), function (data) {
+    		alert(data.unlock_code);
+    		window.location = "cabrequest.html";
+		}).catch(function (jqXHR, textStatus, errorThrown) {
+			alert(textStatus);
+		}); 
+    });
+});
+</script>
+</head>
+<body>
+<img src="cab.jpg" style="float:left;width:300px;height:168px;">
+<br><br><br><h3>Please enter HRMS ID</h3>
+<input type="number" name="hrmsID" id='hrmsID'>
+<br><br><br><button>Submit</button>
+
+</body>
+</html>
