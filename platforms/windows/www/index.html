@@ -1,26 +1,69 @@
 ﻿<!DOCTYPE html>
 <html>
+
 <head>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script>
 $(document).ready(function(){
     $("button").click(function()
     {
-    	$.getJSON('https://sonalib.000webhostapp.com/index.php?rw_app_id=' + $('#hrmsID').val(), function (data) {
-    		alert(data.unlock_code);
-    		window.location = "cabrequest.html";
+    	$.getJSON('https://sonalib.000webhostapp.com/EmployeeDetails.php?emp_id=' + $('#hrmsID').val(), function (data) {
+    		//alert('getJSON');
+    		//window.localStorage.setItem("employee_details", data);
+    		insertEmployeeData(data);
 		}).catch(function (jqXHR, textStatus, errorThrown) {
-			alert(textStatus);
+			alert('Failed Getting Employee Details');
 		}); 
     });
 });
 </script>
+<script>
+function insertEmployeeData(data)
+{
+	//alert("insertEmployeeData:"+data.mobile_no);
+	window.db.transaction(insertEmployee, errorCB, successCB);
+
+	function insertEmployee(tx){
+ 		tx.executeSql("INSERT INTO employees(emp_id, emp_name, department, area, pickup_point, mobile_no, pickup_time, manager_id, email, site_id, route_id, project_code) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",[data.emp_id, data.emp_name, data.department, data.area, data.pickup_point, data.mobile_no, data.pickup_time, data.manager_id, data.email, data.site_id, data.route_id, data.project_code]);
+	}
+
+	function errorCB(err) {
+ 		//alert("insertEmployeeData Error processing SQL: "+err.code+err.message);
+ 		if (err.code==6)
+ 		{
+ 			window.location = "VerifyOTP.html";
+ 		}
+	}
+
+	function successCB() {
+ 		//alert("insertEmployeeData success SQL!");
+ 		window.location = "VerifyOTP.html";
+	}
+}
+</script>
 </head>
+
 <body>
 <img src="cab.jpg" style="float:left;width:300px;height:168px;">
 <br><br><br><h3>Please enter HRMS ID</h3>
 <input type="number" name="hrmsID" id='hrmsID'>
 <br><br><br><button>Submit</button>
+<script type="text/javascript" language="JavaScript">
+	var db = window.openDatabase("CabRequest", "1.0", "Cab-request tool database", 1000000);
+	db.transaction(populateDB, errorCB, successCB);
 
+	function populateDB(tx){
+ 		tx.executeSql('CREATE TABLE IF NOT EXISTS employees (emp_id INT NOT NULL primary key,emp_name TEXT NOT NULL, department TEXT, area TEXT, pickup_point TEXT, mobile_no TEXT, pickup_time TIME, manager_id INT, email TEXT, site_id INT, route_id INT, project_code INT)');
+ 		//tx.executeSql('DROP TABLE IF EXISTS employees');
+	}
+
+	function errorCB(err) {
+ 		alert("Error CREATE processing SQL: "+err.code);
+	}
+
+	function successCB() {
+ 		//alert("success SQL!");
+	}
+</script>
 </body>
 </html>

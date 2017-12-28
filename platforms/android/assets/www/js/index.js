@@ -28,6 +28,7 @@ var app = {
     // 'pause', 'resume', etc.
     onDeviceReady: function() {
         this.receivedEvent('deviceready');
+        alert("reader.onDeviceReady"); 
     },
 
     // Update DOM on a Received Event
