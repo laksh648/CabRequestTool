@@ -4,8 +4,9 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script type="text/javascript" language="JavaScript">
 function sendOTP(){
-	//alert('OTP Processing 1');
-	$.getJSON('https://control.msg91.com/api/sendotp.php?authkey=184935A4LBWvyI8PW5a1553ce&mobile=9766017507&message=YourOTPis7777&sender=OTPSMS&otp=7777&otp_expiry=1&otp_length=4', function (data) {
+	var employeeMobile = window.localStorage.getItem("EmployeeMobileNumber");
+	//alert('OTP Processing'+employeeMobile);
+	$.getJSON("https://control.msg91.com/api/sendotp.php?authkey=184935A4LBWvyI8PW5a1553ce&mobile="+employeeMobile+"&message=&sender=OTPSMS&otp=&otp_expiry=1&otp_length=4", function (data) {
     		//alert(data.message);
     		//alert('OTP Sent success');
 	}).catch(function (jqXHR, textStatus, errorThrown)
@@ -16,8 +17,10 @@ function sendOTP(){
 </script>
 <script type="text/javascript" language="JavaScript">
 function verifyOTP(){
-	alert('Verify OTP Processing');
-    $.getJSON('https://control.msg91.com/api/verifyRequestOTP.php?authkey=184935A4LBWvyI8PW5a1553ce&mobile=9766017507&otp=7777', function (data) {
+	var employeeMobile = window.localStorage.getItem("EmployeeMobileNumber");
+	var otp = $('#OTPTextField').val();
+	alert('verifyOTP Processing'+otp);
+    $.getJSON("https://control.msg91.com/api/verifyRequestOTP.php?authkey=184935A4LBWvyI8PW5a1553ce&mobile="+employeeMobile+"&otp="+otp, function (data) {
     	window.location = "CabRequestForm.html";
 	}).catch(function (jqXHR, textStatus, errorThrown) {
 		alert('Verify OTP Failed');
@@ -28,7 +31,7 @@ function verifyOTP(){
 
 <body>
 <label id="mobile_no"> OTP is sent on </label><br/>
-<input type="number" id='OTPTextField'>
+<input type="number" name="OTPTextField" id='OTPTextField'>
 <button onclick="verifyOTP()">Verify OTP</button>
 <script type="text/javascript" language="JavaScript">
 	//var employeeDetail = window.localStorage.getItem("employee_details");
@@ -43,6 +46,7 @@ function verifyOTP(){
  		$.each(result.rows,function(index){
             var row = result.rows.item(index);
             var mobileValue = row['mobile_no'];
+            window.localStorage.setItem("EmployeeMobileNumber", mobileValue);
             document.getElementById('mobile_no').innerHTML += mobileValue;
         });
 	}

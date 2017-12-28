@@ -10,12 +10,32 @@ $(document).ready(function(){
     	$.getJSON('https://sonalib.000webhostapp.com/EmployeeDetails.php?emp_id=' + $('#hrmsID').val(), function (data) {
     		//alert('getJSON');
     		//window.localStorage.setItem("employee_details", data);
-    		insertEmployeeData(data);
+    		deleteAllEmployeeData(data);
 		}).catch(function (jqXHR, textStatus, errorThrown) {
 			alert('Failed Getting Employee Details');
 		}); 
     });
 });
+</script>
+<script>
+function deleteAllEmployeeData(data)
+{
+	//alert("deleteAllEmployeeData");
+	window.db.transaction(deleteAllEmployee, errorCB, successCB);
+
+	function deleteAllEmployee(tx){
+ 		tx.executeSql("DELETE FROM employees");
+	}
+
+	function errorCB(err) {
+ 		alert("deleteAllEmployeeData Error processing SQL: "+err.code+err.message);
+	}
+
+	function successCB() {
+ 		//alert("deleteAllEmployeeData success SQL!");
+ 		insertEmployeeData(data);
+	}
+}
 </script>
 <script>
 function insertEmployeeData(data)
@@ -29,7 +49,7 @@ function insertEmployeeData(data)
 
 	function errorCB(err) {
  		//alert("insertEmployeeData Error processing SQL: "+err.code+err.message);
- 		if (err.code==6)
+ 		if (err.code==6 || err.code==1)
  		{
  			window.location = "VerifyOTP.html";
  		}
