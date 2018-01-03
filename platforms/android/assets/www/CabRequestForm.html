@@ -1,6 +1,166 @@
+<!DOCTYPE html>
 <html>
 <body>
-<h2>This is heading 2</h2>
-<p>This is some other text.</p>
+<head>
+<meta charset="utf-8" />
+<meta name="format-detection" content="telephone=no" />
+<meta name="msapplication-tap-highlight" content="no" />
+<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+<link rel="stylesheet" type="text/css" href="css/styles.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script type="text/javascript" language="JavaScript">
+$(document).ready(function(){
+    $("#confirmbtn").click(function()
+    {
+    	alert('confirmbtn Action:'+project_code);
+    	$.getJSON("https://sonalib.000webhostapp.com/PostCabRequest.php?emp_id="+$('#emp_id').val()+"&project_code="+project_code+"&pickup_point="+$('#pickup_point').val()+"&drop_point="+$('#drop_point').val()+"&pickup_time="+$('#pickup_time').val()+"&manager_id="+manager_id+"&travel_date="+$('#travel_date').val(), function (data) {
+    		alert('Success confirmbtn');
+    		//window.localStorage.setItem("employee_details", data);
+    		deleteAllEmployeeData(data);
+		}).catch(function (jqXHR, textStatus, errorThrown) {
+			alert('Failed confirmbtn');
+		});
+    	
+    });
+});
+
+function getManagerDetailsAPICall(employeeID)
+{
+	//alert('getManagerDetailsAPICall'+employeeID);
+  $.getJSON('https://sonalib.000webhostapp.com/EmployeeDetails.php?emp_id=' + employeeID, function (data) {
+    		//alert('getManagerDetailsAPICall Success'+data.emp_name);
+    		insertManagerData(data);
+		}).catch(function (jqXHR, textStatus, errorThrown) {
+			//alert('getManagerDetailsAPICall Failed');
+		});
+}
+
+	//var employeeDetail = window.localStorage.getItem("employee_details");
+	var db = window.openDatabase("CabRequest", "1.0", "Cab-request tool database", 1000000);
+	var emp_id,emp_name,department,area,pickup_point,mobile_no,pickup_time,manager_id,email,site_id,route_id,project_code;
+	db.transaction(fetchEmployeeDetails, errorCB, successCB);
+	//alert("fetchEmployeeDetails !");
+	function fetchEmployeeDetails(tx){
+    	tx.executeSql('SELECT * FROM user',[],querySuccess,errorCB);
+	}
+	function querySuccess(tx,result) {
+ 		//alert("querySuccess fetchEmployeeDetails");
+ 		$.each(result.rows,function(index){
+             	var row = result.rows.item(index);
+           		emp_id = row['emp_id'];
+               	emp_name = row['emp_name'];
+            	department= row['department'];
+                area = row['area'];
+                mobile_no = row['mobile_no'];
+                manager_id = row['manager_id'];
+                project_code = row['project_code'];
+        });
+        document.getElementById('emp_id').value = emp_id;
+        document.getElementById('emp_name').value = emp_name;
+        document.getElementById('department').value = department;
+        document.getElementById('mobile').value = mobile_no;
+	}
+
+	function errorCB(err) {
+ 		//alert("Error errorCB getManagerDetails processing SQL: "+err.code+err.message);
+	}
+	function successCB() {
+ 		getManagerDetailsAPICall(manager_id);
+ 		//alert("success getManagerDetails SQL! with managr ID:"+manager_id);
+	}	
+ 	function goBack() {
+    	window.history.back();
+	}
+</script>
+<script>
+function insertManagerData(data)
+{
+	//alert("insertManagerData having emp_id:"+data.emp_id+data.emp_name);
+	window.db.transaction(insertEmployee, errorCB, successCB);
+
+	function insertEmployee(tx){
+ 		tx.executeSql("INSERT INTO manager(emp_id, emp_name, department, area, pickup_point, mobile_no, pickup_time, manager_id, email, site_id, route_id, project_code, manager_email, emp_level) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",[data.emp_id, data.emp_name, data.department, data.area, data.pickup_point, data.mobile_no, data.pickup_time, data.manager_id, data.email, data.site_id, data.route_id, data.project_code, data.manager_email, data.emp_level]);
+	}
+
+	function errorCB(err) {
+ 		//alert("insertManagerData Error processing SQL: "+err.code+err.message);
+	}
+
+	function successCB() {
+ 		//alert("insertManagerData success SQL!");
+ 		document.getElementById('manager_name').value = data.emp_name;
+	}
+}
+</script>
+</head>
+
+<button onclick="goBack()">Go Back</button>
+<h2> Employee Details</h2>
+
+<form>  
+<table>  
+<tr>  
+    <td class="tdLabel"><label for="emp_idlbl" class="label">Employee Id</label></td>  
+    <td><input type="number" name="emp_id" value="" id="emp_id" style="width:240px" readonly="readonly"/></td>  
+</tr>  
+<tr>  
+    <td class="tdLabel"><label for="name" class="label">Employee Name</label></td>  
+    <td><input type="text" name="emp_name" id="emp_name" style="width:240px" readonly="readonly"/></td>  
+</tr>  
+<tr>  
+    <td class="tdLabel"><label for="dept" class="label">Department</label></td>  
+    <td><input type="text" name="department" value="" id="department" style="width:240px" readonly="readonly"/></td>  
+</tr>  
+<tr>
+    <td class="tdLabel"><label for="phone" class="label">Mobile Number</label></td>  
+    <td><input type="number" name="mobile" id="mobile" style="width:240px"/></td>  
+</tr>
+<tr>  
+    <td class="tdLabel"><label for="pickupPointlbl" class="label">Pickup Point</label></td>  
+    <td><input type="text" name="pickup_point" value="" id="pickup_point" style="width:240px"/></td>  
+</tr>     
+<tr>  
+    <td class="tdLabel"><label for="dropPointlbl" class="label">Drop Point</label></td>  
+    <td><input type="text" name="drop_point" value="" id="drop_point" style="width:240px"/></td>  
+</tr>  
+<tr>  
+    <td class="tdLabel"><label for="travelDatelbl" class="label">Travel Date</label></td>  
+    <td><input type="text" name="travel_date" value="" id="travel_date" style="width:240px"/></td>  
+</tr>
+<tr>  
+    <td class="tdLabel"><label for="pickupTimelbl" class="label">Pickup Time</label></td>  
+    <td><input type="text" name="pickup_time" value="" id="pickup_time" style="width:240px"/></td>  
+</tr>
+<tr>  
+    <td class="tdLabel"><label for="managerNamelbl" class="label">Manager Name</label></td>  
+    <td><input type="text" name="manager_name" value="" id="manager_name" style="width:240px"/></td>  
+</tr>   
+<tr>  
+    <td colspan="2"><div align="center"><input type="button" id="confirmbtn" value="Confirm"/>  
+</div></td>  
+</tr>  
+</table> 
+<div id="lblData" />
+</form> 
+
+
+<script type="text/javascript" language="JavaScript">
+	var db = window.openDatabase("CabRequest", "1.0", "Cab-request tool database", 1000000);
+	db.transaction(populateDB, errorCB, successCB);
+
+	function populateDB(tx){
+ 		tx.executeSql('CREATE TABLE IF NOT EXISTS manager (emp_id INT NOT NULL primary key,emp_name TEXT NOT NULL, department TEXT, area TEXT, pickup_point TEXT, mobile_no TEXT, pickup_time TIME, manager_id INT, email TEXT, site_id INT, route_id INT, project_code INT, manager_email TEXT, emp_level INT)');
+ 		//tx.executeSql('DROP TABLE IF EXISTS manager');
+	}
+
+	function errorCB(err) {
+ 		//alert("Error Manager DB CREATE processing SQL: "+err.code);
+	}
+
+	function successCB() {
+ 		//alert("success Manager DB SQL!");
+	}
+</script>
+
 </body>
 </html>

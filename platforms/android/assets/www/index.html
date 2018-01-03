@@ -2,6 +2,7 @@
 <html>
 
 <head>
+<link rel="stylesheet" type="text/css" href="css/styles.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script>
 $(document).ready(function(){
@@ -12,7 +13,7 @@ $(document).ready(function(){
     		//window.localStorage.setItem("employee_details", data);
     		deleteAllEmployeeData(data);
 		}).catch(function (jqXHR, textStatus, errorThrown) {
-			alert('Failed Getting Employee Details');
+			//alert('Failed Getting Employee Details');
 		}); 
     });
 });
@@ -24,11 +25,11 @@ function deleteAllEmployeeData(data)
 	window.db.transaction(deleteAllEmployee, errorCB, successCB);
 
 	function deleteAllEmployee(tx){
- 		tx.executeSql("DELETE FROM employees");
+ 		tx.executeSql("DELETE FROM user");
 	}
 
 	function errorCB(err) {
- 		alert("deleteAllEmployeeData Error processing SQL: "+err.code+err.message);
+ 		//alert("deleteAllEmployeeData Error processing SQL: "+err.code+err.message);
 	}
 
 	function successCB() {
@@ -44,11 +45,11 @@ function insertEmployeeData(data)
 	window.db.transaction(insertEmployee, errorCB, successCB);
 
 	function insertEmployee(tx){
- 		tx.executeSql("INSERT INTO employees(emp_id, emp_name, department, area, pickup_point, mobile_no, pickup_time, manager_id, email, site_id, route_id, project_code) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",[data.emp_id, data.emp_name, data.department, data.area, data.pickup_point, data.mobile_no, data.pickup_time, data.manager_id, data.email, data.site_id, data.route_id, data.project_code]);
+ 		tx.executeSql("INSERT INTO user(emp_id, emp_name, department, area, pickup_point, mobile_no, pickup_time, manager_id, email, site_id, route_id, project_code, manager_email, emp_level) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",[data.emp_id, data.emp_name, data.department, data.area, data.pickup_point, data.mobile_no, data.pickup_time, data.manager_id, data.email, data.site_id, data.route_id, data.project_code, data.manager_email, data.emp_level]);
 	}
 
 	function errorCB(err) {
- 		//alert("insertEmployeeData Error processing SQL: "+err.code+err.message);
+ 		alert("insertEmployeeData Error processing SQL: "+err.code+err.message);
  		if (err.code==6 || err.code==1)
  		{
  			window.location = "VerifyOTP.html";
@@ -64,21 +65,26 @@ function insertEmployeeData(data)
 </head>
 
 <body>
-<img src="cab.jpg" style="float:left;width:300px;height:168px;">
-<br><br><br><h3>Please enter HRMS ID</h3>
+
+<div id="wrapper" style="width:100%; text-align:center">
+<img id="img"src="img/Login_logo.jpg" alt="UTC Aerospace System"></div>
+<div id="content">
+<br><h3 id ="hrmsLabel">Please enter HRMS ID</h3>
 <input type="number" name="hrmsID" id='hrmsID'>
-<br><br><br><button>Submit</button>
+<br><br><br><button id="submit">Submit</button>
+</div>
+
 <script type="text/javascript" language="JavaScript">
 	var db = window.openDatabase("CabRequest", "1.0", "Cab-request tool database", 1000000);
 	db.transaction(populateDB, errorCB, successCB);
 
 	function populateDB(tx){
- 		tx.executeSql('CREATE TABLE IF NOT EXISTS employees (emp_id INT NOT NULL primary key,emp_name TEXT NOT NULL, department TEXT, area TEXT, pickup_point TEXT, mobile_no TEXT, pickup_time TIME, manager_id INT, email TEXT, site_id INT, route_id INT, project_code INT)');
- 		//tx.executeSql('DROP TABLE IF EXISTS employees');
+ 		tx.executeSql('CREATE TABLE IF NOT EXISTS user (emp_id INT NOT NULL primary key,emp_name TEXT NOT NULL, department TEXT, area TEXT, pickup_point TEXT, mobile_no TEXT, pickup_time TIME, manager_id INT, email TEXT, site_id INT, route_id INT, project_code INT, manager_email TEXT, emp_level INT)');
+ 		//tx.executeSql('DROP TABLE IF EXISTS user');
 	}
 
 	function errorCB(err) {
- 		alert("Error CREATE processing SQL: "+err.code);
+ 		//alert("Error CREATE processing SQL: "+err.code);
 	}
 
 	function successCB() {

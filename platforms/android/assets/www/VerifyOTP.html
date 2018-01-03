@@ -19,7 +19,7 @@ function sendOTP(){
 function verifyOTP(){
 	var employeeMobile = window.localStorage.getItem("EmployeeMobileNumber");
 	var otp = $('#OTPTextField').val();
-	alert('verifyOTP Processing'+otp);
+	//alert('verifyOTP Processing'+otp);
     $.getJSON("https://control.msg91.com/api/verifyRequestOTP.php?authkey=184935A4LBWvyI8PW5a1553ce&mobile="+employeeMobile+"&otp="+otp, function (data) {
     	window.location = "CabRequestForm.html";
 	}).catch(function (jqXHR, textStatus, errorThrown) {
@@ -39,7 +39,7 @@ function verifyOTP(){
 	db.transaction(fetchEmployeeDetails, errorCB, successCB);
 	//alert("fetchEmployeeDetails !");
 	function fetchEmployeeDetails(tx){
-    	tx.executeSql('SELECT * FROM employees',[],querySuccess,errorCB);
+    	tx.executeSql('SELECT * FROM user',[],querySuccess,errorCB);
 	}
 	function querySuccess(tx,result) {
  		//alert("querySuccess fetchEmployeeDetails");
