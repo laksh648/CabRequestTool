@@ -1,0 +1,58 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+<link rel="stylesheet" type="text/css" href="css/styles.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+function getAllEmployeesAPI()
+{
+$.getJSON('http://localhost/CabRequest/EmployeeDetails.php?', function (data) {
+    		displayAllEmployees();
+		}).catch(function (jqXHR, textStatus, errorThrown) {
+			alert('Failed Getting All Employee Details');
+		});
+}
+</script>
+<script>
+function displayAllEmployees(data) 
+{
+    var myTableDiv = document.getElementById("myDynamicTable");
+    var table = document.createElement('TABLE');    
+    var tableBody = document.createElement('TBODY');
+    table.appendChild(tableBody);
+    for (i = 0; i < data.length; i++)
+    {
+    	var jsonData = data[i];
+       	var tr = document.createElement('TR');
+       	tableBody.appendChild(tr);
+       	
+        var td = document.createElement('TD');
+    	td.width='800';
+    	td.height='200';
+        td.appendChild(document.createTextNode(jsonData.emp_name));
+        
+        var checkbox = document.createElement('input');
+		checkbox.type = "checkbox";
+		checkbox.name = "employeeCheckBox";
+		//checkbox.value = "value";
+		checkbox.id = jsonData.emp_id;
+		td.appendChild(checkbox);
+		
+		var hr = document.createElement("hr");
+		td.appendChild(hr);
+		
+        tr.appendChild(td);
+    }
+    myTableDiv.appendChild(table);
+}
+</script>
+</head>
+
+<body>
+
+<div id="myDynamicTable" role="main" class="ui-content"> 
+</div>
+getAllEmployeesAPI();
+</body>
+</html>

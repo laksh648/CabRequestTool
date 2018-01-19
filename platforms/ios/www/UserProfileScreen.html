@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<link rel="stylesheet" type="text/css" href="css/styles.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="js/jquery.mobile-1.4.5.min.js"></script>
+<link href="js/jquery.mobile-1.4.5.min.css" rel="stylesheet"/>
+<link rel="stylesheet" href="jquery.ui.datepicker.mobile.css" />
+<link rel="stylesheet" type="text/css" href="css/styles.css">
+</head>
+
+<body>
+
+<div role="main" class="ui-content">
+    <form>  
+	<table align="center">  
+	<tr>  
+	    <td class="tdLabel"><label for="dept" class="label">Department</label></td>  
+    	<td><input type="text" name="department" value="" id="department" style="width:240px" readonly="readonly"/></td>  
+	</tr>
+
+	<tr>  
+    	<td class="tdLabel"><label for="pickupPointlbl" class="label">Project Name</label></td>  
+    	<td><input type="text" name="projectname" value="" id="projectname" style="width:240px"/></td>  
+	</tr>
+     
+	<tr>  
+    	<td class="tdLabel"><label for="supervisorlbl" class="label">Supervisor</label></td>  
+    	<td><input type="text" name="supervisor" value="" id="supervisor" style="width:240px"/></td>  
+	</tr>
+  
+	<tr>  
+    	<td class="tdLabel"><label for="engmanagerlbl" class="label">Engineering Manager</label></td>  
+    	<td><input type="text" name="engmanager" value="" id="engmanager" style="width:50px" readonly="readonly"/><button id="search"></button></td>  
+	</tr>
+   
+	<tr>  
+    	<td colspan="2">
+    	<div align="center"><input type="button" id="confirmbtn" value="Confirm"/></div>
+		</td>  
+	</tr>  
+	</table> 
+	</form> 
+</div>
+
+</body>
+</html>

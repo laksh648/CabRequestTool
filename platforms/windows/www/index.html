@@ -8,12 +8,15 @@
 $(document).ready(function(){
     $("button").click(function()
     {
+    	//http://localhost/CabRequest/EmployeeDetails.php?emp_id=
+    	//https://sonalib.000webhostapp.com/EmployeeDetails.php?emp_id=
     	$.getJSON('https://sonalib.000webhostapp.com/EmployeeDetails.php?emp_id=' + $('#hrmsID').val(), function (data) {
-    		//alert('getJSON');
+    		//alert('login success');
     		//window.localStorage.setItem("employee_details", data);
     		deleteAllEmployeeData(data);
+    		deleteAllManagerData();
 		}).catch(function (jqXHR, textStatus, errorThrown) {
-			//alert('Failed Getting Employee Details');
+			alert('Failed Getting Employee Details');
 		}); 
     });
 });
@@ -26,6 +29,26 @@ function deleteAllEmployeeData(data)
 
 	function deleteAllEmployee(tx){
  		tx.executeSql("DELETE FROM user");
+	}
+
+	function errorCB(err) {
+ 		//alert("deleteAllEmployeeData Error processing SQL: "+err.code+err.message);
+	}
+
+	function successCB() {
+ 		//alert("deleteAllEmployeeData success SQL!");
+ 		insertEmployeeData(data);
+	}
+}
+</script>
+<script>
+function deleteAllManagerData()
+{
+	//alert("deleteAllManagerData");
+	window.db.transaction(deleteAllEmployee, errorCB, successCB);
+
+	function deleteAllEmployee(tx){
+ 		tx.executeSql("DELETE FROM manager");
 	}
 
 	function errorCB(err) {

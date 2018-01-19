@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<meta name="format-detection" content="telephone=no" />
+<meta name="msapplication-tap-highlight" content="no" />
+<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+<link rel="stylesheet" type="text/css" href="css/styles.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="js/jquery.mobile-1.4.5.min.js"></script>
+<link href="js/jquery.mobile-1.4.5.min.css" rel="stylesheet"/>
+
+<script type="text/javascript" language="JavaScript">
+var db = window.openDatabase("CabRequest", "1.0", "Cab-request tool database", 1000000);
+var emp_id,emp_level,project_code, emArray;
+db.transaction(fetchEmployeeDetails, errorCB, successCB);
+function fetchEmployeeDetails(tx){
+    tx.executeSql('SELECT * FROM user',[],querySuccess,errorCB);
+}
+function querySuccess(tx,result) {
+ 	$.each(result.rows,function(index){
+        	var row = result.rows.item(index);
+        	emp_id = row['emp_id'];
+        	emp_level = row['emp_level'];
+        	project_code = row['project_code'];
+        	//alert("success getUserData emp_level:"+emp_level);
+    });
+    if (emp_level==15)
+    {
+    	// All EM requests
+    	getAllEMCabRequestsAPI();
+    }
+    else
+    {
+    	// All manager requests
+    	getAllCabRequestsAPI();
+    }
+	
+}
+
+function errorCB(err) {
+ 	//alert("Error getUserData SQL: "+err.code+err.message);
+}
+function successCB() {
+ 	//alert("success getUserData 2");
+}
+</script>
+
+<script>
+function getAllCabRequestsAPI()
+{
+	//alert('getAllCabRequestsAPI emp_id'+emp_id);
+	//http://localhost/CabRequest/GetAllCabRequests.php?manager_id=
+	//https://sonalib.000webhostapp.com/GetAllCabRequests.php?manager_id=
+  	$.getJSON('https://sonalib.000webhostapp.com/GetAllCabRequests.php?manager_id=' +emp_id, function (data) 
+  	{
+    	//alert('getAllCabRequestsAPI Success');
+    	displayCabRequests(data);
+	}).catch(function (jqXHR, textStatus, errorThrown) {
+		//alert('getAllCabRequestsAPI Failed');
+	});
+}
+</script>
+
+<script>
+function getAllEMCabRequestsAPI()
+{
+	//alert('getAllCabRequestsAPI emp_id'+emp_id);
+	//http://localhost/CabRequest/GetAllCabRequests.php?manager_id=
+	//https://sonalib.000webhostapp.com/GetAllCabRequests.php?manager_id=
+  	$.getJSON('https://sonalib.000webhostapp.com/GetAllEMCabRequests.php?manager_id=' +emp_id, function (data) 
+  	{
+    	//alert('getAllEMCabRequestsAPI Success');
+    	displayCabRequests(data);
+	}).catch(function (jqXHR, textStatus, errorThrown) {
+		//alert('getAllEMCabRequestsAPI Failed');
+	});
+}
+</script>
+
+<script>
+function getEngineeringManagersAPI()
+{
+	//alert('getEngineeringManagersAPI project_code:'+project_code);
+	//http://localhost/CabRequest/GetEngineeringManagers.php?emp_level=15&project_code=
+	//https://sonalib.000webhostapp.com/GetAllCabRequests.php?manager_id=
+  	$.getJSON("https://sonalib.000webhostapp.com/GetEngineeringManagers.php?emp_level=15&project_code="+project_code, function (data) 
+  	{
+  		//alert('getEngineeringManagersAPI Success:');
+    	emArray = data;
+    	//var table = document.getElementById ("cabRequestsTbl");
+    	//table.refresh ();
+	}).catch(function (jqXHR, textStatus, errorThrown) {
+		//alert('getEngineeringManagersAPI Failed');
+	});
+}
+</script>
+<script>
+function displayCabRequests(data) 
+{
+	//alert('displayCabRequests_emp_level:'+emp_level);
+    var myTableDiv = document.getElementById("myDynamicTable");
+    var table = document.createElement('TABLE');    
+    //table.border='1';
+    var tableBody = document.createElement('TBODY');
+    table.appendChild(tableBody);
+    for (i = 0; i < data.length; i++)
+    {
+    	var jsonData = data[i];
+       	var tr = document.createElement('TR');
+       	tableBody.appendChild(tr);
+       	
+        var td = document.createElement('TD');
+    	td.width='800';
+    	td.height='200';
+        td.appendChild(document.createTextNode("Employee name: " + jsonData.requester_emp_name));
+        
+        var br = document.createElement("br");
+		td.appendChild(br);
+        td.appendChild(document.createTextNode("Request ID: " + jsonData.request_id));
+        
+        var br = document.createElement("br");
+		td.appendChild(br);
+        td.appendChild(document.createTextNode("Project ID: " + jsonData.project_id));
+        
+        var br = document.createElement("br");
+		td.appendChild(br);
+        td.appendChild(document.createTextNode("Pickup Point: " + jsonData.pickup_point));
+        
+        var br = document.createElement("br");
+		td.appendChild(br);
+        td.appendChild(document.createTextNode("Drop Point: " + jsonData.drop_point));        
+        
+        var br = document.createElement("br");
+		td.appendChild(br);
+        td.appendChild(document.createTextNode("Travel Date: " + jsonData.travel_date));
+        
+        var br = document.createElement("br");
+		td.appendChild(br);
+        td.appendChild(document.createTextNode("Pickup Time: " + jsonData.pickup_time));
+                        
+        var br = document.createElement("br");
+		td.appendChild(br);
+		var br = document.createElement("br");
+		td.appendChild(br);                
+                
+                var approveBtn;
+                if (emp_level==15)
+                {
+                	// EM actions
+                	approveBtn = document.createElement('A');
+					approveBtn.setAttribute("class", "ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-a");
+					approveBtn.setAttribute("id", jsonData.request_id);
+                	if (jsonData.status==2)
+					{
+						// EM approval action
+						//approveBtn.value = "Approve";
+						approveBtn.appendChild(document.createTextNode("Approve"));
+						approveBtn.onclick = function () 
+						{
+							var temp_request_id = this.id;
+							//alert('EM approval action'+temp_request_id);
+    						$.getJSON("https://sonalib.000webhostapp.com/EMCabRequestAction.php?request_id="+temp_request_id+"&status=3&manager_id="+emp_id, function (data) 
+  							{
+    							alert('Cab request approved successfully');
+							}).catch(function (jqXHR, textStatus, errorThrown) {
+								alert('Failed to approve the request. Please try later.');
+							});
+						};
+						
+						var rejectBtn = document.createElement('A');
+						rejectBtn.setAttribute("id", jsonData.request_id);
+						rejectBtn.setAttribute("href", "#rejectPopupMenu");
+						rejectBtn.setAttribute("data-rel", "popup");
+						rejectBtn.setAttribute("data-transition", "slideup");
+						rejectBtn.setAttribute("class", "ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-a");
+						rejectBtn.appendChild(document.createTextNode("Reject"));
+						td.appendChild(rejectBtn);
+					}
+					else if (jsonData.status==3)
+					{
+						//approveBtn.value = "Approved";
+						approveBtn.appendChild(document.createTextNode("Approved"));
+					}                	
+					
+				}
+                else
+                {
+                	// Managers actions
+                	approveBtn = document.createElement('A');
+					approveBtn.setAttribute("id", jsonData.request_id);
+					approveBtn.setAttribute("href", "#popupMenu");
+					approveBtn.setAttribute("data-rel", "popup");
+					approveBtn.setAttribute("data-transition", "slideup");
+					approveBtn.setAttribute("class", "ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-a");
+					//$('#popupMenu').append(approveBtn).trigger('create');					
+					
+					if (jsonData.status==3)
+					{
+						approveBtn.appendChild(document.createTextNode("Approved"));
+					}
+					else if (jsonData.status==2)
+					{
+						approveBtn.appendChild(document.createTextNode("Pending for Approval"));
+					}
+					else
+					{
+						approveBtn.appendChild(document.createTextNode("Approve"));		
+						if (jsonData.status==0 && emp_level!=15)
+						{
+							// Immediate manager approval action
+							approveBtn.onclick = function () 
+							{
+								var temp_request_id = this.id;
+								//alert('approveRequestAction_request_ID:'+temp_request_id);
+								var ul = document.getElementById("popupMenuUL");    				
+    							for (m = 0; m < emArray.length; m++)
+    							{
+    								var li = document.createElement('li');
+    								var emJsonData = emArray[m];
+    								li.appendChild(document.createTextNode(emJsonData.emp_name));
+  									li.setAttribute("id", emJsonData.emp_id); // added line
+  									ul.appendChild(li);
+    							}    
+								$('#popupMenuUL').on('click', 'li', function() 
+								{
+									var temp_em_id = $(this).attr('id');
+        							//alert('EM ID:'+temp_em_id);
+        			
+        							$.getJSON("https://sonalib.000webhostapp.com/CabRequestAction.php?request_id="+temp_request_id+"&status=2&manager_id="+temp_em_id, function (data) 
+  									{
+    									alert('Sent for approval to engineering manager successfully');
+    									//var table = document.getElementById ("cabRequestsTbl");
+    									//table.refresh();
+									}).catch(function (jqXHR, textStatus, errorThrown) {
+										alert('Failed to send for approval to engineering manager');
+									});
+    							});
+							};
+						}
+						var rejectBtn = document.createElement('A');
+						rejectBtn.setAttribute("id", jsonData.request_id);
+						rejectBtn.setAttribute("href", "#rejectPopupMenu");
+						rejectBtn.setAttribute("data-rel", "popup");
+						rejectBtn.setAttribute("data-transition", "slideup");
+						rejectBtn.setAttribute("class", "ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-a");
+						rejectBtn.appendChild(document.createTextNode("Reject"));
+						td.appendChild(rejectBtn);
+					}
+                }
+		td.appendChild(approveBtn);
+		
+		var hr = document.createElement("hr");
+		td.appendChild(hr);
+		
+        tr.appendChild(td);
+    }
+    myTableDiv.appendChild(table);
+    if (emp_level!=15)
+	{
+		getEngineeringManagersAPI();
+	}
+}
+
+</script>
+<script>
+function pushNextScreen(theUrl)
+{
+  //document.location.href = theUrl;
+  window.location = theUrl;
+}
+</script>
+</head>
+
+<body>
+<div data-role="page" id="home">
+<div data-role="header" data-theme="b">
+	<a href="#left-panel" data-icon="bars" data-iconpos="notext" class="ui-nodisc-icon">Open left panel</a>
+    <h1>Approvals</h1>
+</div>
+
+<div id="myDynamicTable" role="main" class="ui-content">
+</div>
+
+<div data-role="popup" id="popupMenu" data-theme="b">
+        <ul data-role="listview" id="popupMenuUL" data-inset="true" style="min-width:300px;">
+            <li data-role="list-divider">Choose an Approver</li>
+        </ul>
+</div>
+
+<div data-role="popup" id="rejectPopupMenu" data-theme="b">
+        <h3 id ="hrmsLabel">Confirm you want to reject the request?</h3>
+		<button id="okReject">YES</button>
+		<button id="cancelReject">NO</button>
+</div>
+
+<div data-role="panel" id="left-panel" data-theme="b">
+    <table>  
+	<tr onclick="pushNextScreen('UserProfileScreen.html');">  
+    	<td height="60" class="tdLabel"><label for="userProfileScreen" class="label">Your Profile</label></td>  
+	</tr>
+	<tr onclick="pushNextScreen('CabRequestForm.html');">  
+    	<td height="60" class="tdLabel"><label for="cabRequestForm" class="label">Request a Cab</label></td>  
+	</tr>
+	<tr onclick="pushNextScreen('HistoryScreen.html');">  
+    	<td height="60" class="tdLabel"><label for="history" class="label">History</label></td>  
+	</tr>  
+	<tr onclick="pushNextScreen('ApprovalScreen.html');">  
+    	<td height="60" class="tdLabel"><label for="approvals" class="label">Approvals</label></td>  
+	</tr> 
+	<tr onclick="pushNextScreen('index.html');">  
+	    <td height="60" class="tdLabel"><label for="logout" class="label">Logout</label></td>  
+	</tr>
+	</table>
+</div>
+</div>
+
+</body>
+</html>

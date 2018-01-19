@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<meta name="format-detection" content="telephone=no" />
+<meta name="msapplication-tap-highlight" content="no" />
+<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+<link rel="stylesheet" type="text/css" href="css/styles.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="js/jquery.mobile-1.4.5.min.js"></script>
+<link href="js/jquery.mobile-1.4.5.min.css" rel="stylesheet"/>
+
+<script type="text/javascript" language="JavaScript">
+
+var db = window.openDatabase("CabRequest", "1.0", "Cab-request tool database", 1000000);
+var emp_id;
+db.transaction(fetchEmployeeDetails, errorCB, successCB);
+function fetchEmployeeDetails(tx){
+    tx.executeSql('SELECT * FROM user',[],querySuccess,errorCB);
+}
+function querySuccess(tx,result) {
+ 	$.each(result.rows,function(index){
+        	var row = result.rows.item(index);
+        	emp_id = row['emp_id'];
+        	//alert("success getUserData emp_level:"+emp_level);
+    });
+    getAllCabRequestsAPI();	
+}
+
+function errorCB(err) {
+ 	//alert("Error getUserData SQL: "+err.code+err.message);
+}
+function successCB() {
+ 	//alert("success getUserData 2");
+}
+</script>
+
+<script>
+function getAllCabRequestsAPI()
+{
+	//alert('getAllCabRequestsAPI emp_id'+emp_id);
+	//http://localhost/CabRequest/GetAllCabRequests.php?manager_id=
+	//https://sonalib.000webhostapp.com/GetAllCabRequests.php?manager_id=
+  	$.getJSON('https://sonalib.000webhostapp.com/GetAllCabRequests.php?requester_emp_id=' +emp_id, function (data) 
+  	{
+    	//alert('getAllCabRequestsAPI Success');
+    	displayCabRequests(data);
+	}).catch(function (jqXHR, textStatus, errorThrown) {
+		//alert('getAllCabRequestsAPI Failed');
+	});
+}
+</script>
+
+<script>
+function displayCabRequests(data) 
+{
+	//alert('displayCabRequests_emp_level:'+emp_level);
+    var myTableDiv = document.getElementById("myDynamicTable");
+    var table = document.createElement('TABLE');    
+    //table.width='800';
+    var tableBody = document.createElement('TBODY');
+    table.appendChild(tableBody);
+    for (i = 0; i < data.length; i++)
+    {
+    	var jsonData = data[i];
+       	var tr = document.createElement('TR');
+       	tableBody.appendChild(tr);
+       	
+        var td = document.createElement('TD');
+    	td.width='800';
+    	td.height='200';
+        td.appendChild(document.createTextNode("Employee name: " + jsonData.requester_emp_name));
+        
+        var br = document.createElement("br");
+		td.appendChild(br);
+        td.appendChild(document.createTextNode("Request ID: " + jsonData.request_id));
+        
+        var br = document.createElement("br");
+		td.appendChild(br);
+        td.appendChild(document.createTextNode("Project ID: " + jsonData.project_id));
+        
+        var br = document.createElement("br");
+		td.appendChild(br);
+        td.appendChild(document.createTextNode("Pickup Point: " + jsonData.pickup_point));
+        
+        var br = document.createElement("br");
+		td.appendChild(br);
+        td.appendChild(document.createTextNode("Drop Point: " + jsonData.drop_point));        
+        
+        var br = document.createElement("br");
+		td.appendChild(br);
+        td.appendChild(document.createTextNode("Travel Date: " + jsonData.travel_date));
+        
+        var br = document.createElement("br");
+		td.appendChild(br);
+        td.appendChild(document.createTextNode("Pickup Time: " + jsonData.pickup_time));
+                        
+        var br = document.createElement("br");
+		td.appendChild(br);
+		
+		var x = document.createElement("B");
+    	var t;
+		
+		if (jsonData.status==3)
+		{
+			t=document.createTextNode("Status: Approved");
+		}   
+		else if (jsonData.status==1 || jsonData.status==4)
+		{
+			t=document.createTextNode("Status: Rejected");
+		} 
+		else if (jsonData.status==2)
+		{
+			t=document.createTextNode("Status: Approval In Progress");
+		} 
+		else if (jsonData.status==0)
+		{
+			t=document.createTextNode("Status: Applied");
+		} 
+		x.appendChild(t);
+		td.appendChild(x);
+		
+		var hr = document.createElement("hr");
+		//hr.width = 500;
+		td.appendChild(hr);
+		
+        tr.appendChild(td);        
+    }
+    myTableDiv.appendChild(table);
+}
+
+</script>
+<script>
+function pushNextScreen(theUrl)
+{
+  //document.location.href = theUrl;
+  window.location = theUrl;
+}
+</script>
+</head>
+
+<body>
+<div data-role="page" id="home">
+<div data-role="header" data-theme="b">
+	<a href="#left-panel" data-icon="bars" data-iconpos="notext" class="ui-nodisc-icon">Open left panel</a>
+    <h1>Approvals</h1>
+</div>
+
+<div id="myDynamicTable" role="main" class="ui-content">
+</div>
+
+<div data-role="panel" id="left-panel" data-theme="b">
+    <table>  
+	<tr onclick="pushNextScreen('UserProfileScreen.html');">  
+    	<td height="60" class="tdLabel"><label for="userProfileScreen" class="label">Your Profile</label></td>  
+	</tr>
+	<tr onclick="pushNextScreen('CabRequestForm.html');">  
+    	<td height="60" class="tdLabel"><label for="cabRequestForm" class="label">Request a Cab</label></td>  
+	</tr>
+	<tr onclick="pushNextScreen('HistoryScreen.html');">  
+    	<td height="60" class="tdLabel"><label for="history" class="label">History</label></td>  
+	</tr>  
+	<tr onclick="pushNextScreen('ApprovalScreen.html');">  
+    	<td height="60" class="tdLabel"><label for="approvals" class="label">Approvals</label></td>  
+	</tr> 
+	<tr onclick="pushNextScreen('index.html');">  
+	    <td height="60" class="tdLabel"><label for="logout" class="label">Logout</label></td>  
+	</tr>
+	</table>
+</div>
+</div>
+
+</body>
+</html>

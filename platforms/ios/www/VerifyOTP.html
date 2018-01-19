@@ -1,38 +1,43 @@
 <!DOCTYPE html>
 <html>
 <head>
+<link rel="stylesheet" type="text/css" href="css/styles.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script type="text/javascript" language="JavaScript">
 function sendOTP(){
 	var employeeMobile = window.localStorage.getItem("EmployeeMobileNumber");
-	//alert('OTP Processing'+employeeMobile);
-	$.getJSON("https://control.msg91.com/api/sendotp.php?authkey=184935A4LBWvyI8PW5a1553ce&mobile="+employeeMobile+"&message=&sender=OTPSMS&otp=&otp_expiry=1&otp_length=4", function (data) {
-    		//alert(data.message);
-    		//alert('OTP Sent success');
+	//Muthu SMS OTP auth key: 191430ABN3Pg2IP5a4f1469
+	//Sonali SMS OTP auth key: 184935A4LBWvyI8PW5a1553ce
+	$.getJSON("https://control.msg91.com/api/sendotp.php?authkey=191430ABN3Pg2IP5a4f1469&mobile="+employeeMobile, function (data) {
+    	//alert('sendOTP'+data.type);
+    	//alert('OTP Sent success');
 	}).catch(function (jqXHR, textStatus, errorThrown)
 	{
-			alert('OTP send failed');
+		alert('OTP send failed');
 	});
 }
 </script>
 <script type="text/javascript" language="JavaScript">
 function verifyOTP(){
-	var employeeMobile = window.localStorage.getItem("EmployeeMobileNumber");
-	var otp = $('#OTPTextField').val();
+	window.location = "UserProfileScreen.html";
+	//var employeeMobile = window.localStorage.getItem("EmployeeMobileNumber");
+	//var otp = $('#OTPTextField').val();
 	//alert('verifyOTP Processing'+otp);
-    $.getJSON("https://control.msg91.com/api/verifyRequestOTP.php?authkey=184935A4LBWvyI8PW5a1553ce&mobile="+employeeMobile+"&otp="+otp, function (data) {
-    	window.location = "CabRequestForm.html";
-	}).catch(function (jqXHR, textStatus, errorThrown) {
-		alert('Verify OTP Failed');
-	});
+    //$.getJSON("https://control.msg91.com/api/verifyRequestOTP.php?authkey=191430ABN3Pg2IP5a4f1469&mobile="+employeeMobile+"&otp="+otp, function (data) {
+    	//window.location = "UserProfileScreen.html";
+	//}).catch(function (jqXHR, textStatus, errorThrown) {
+		//alert('OTP Verification Failed');
+	//});
 }
 </script>
 </head>
 
 <body>
-<label id="mobile_no"> OTP is sent on </label><br/>
+<div id="content">
+<br><label id="mobile_no"> OTP sent on </label><br/>
 <input type="number" name="OTPTextField" id='OTPTextField'>
-<button onclick="verifyOTP()">Verify OTP</button>
+<br><br><br><button id="submit" onclick="verifyOTP()">Verify OTP</button>
+</div>
 <script type="text/javascript" language="JavaScript">
 	//var employeeDetail = window.localStorage.getItem("employee_details");
 	var db = window.openDatabase("CabRequest", "1.0", "Cab-request tool database", 1000000);
@@ -43,12 +48,18 @@ function verifyOTP(){
 	}
 	function querySuccess(tx,result) {
  		//alert("querySuccess fetchEmployeeDetails");
+ 		var mob_first, mob_last;
  		$.each(result.rows,function(index){
             var row = result.rows.item(index);
             var mobileValue = row['mobile_no'];
             window.localStorage.setItem("EmployeeMobileNumber", mobileValue);
-            document.getElementById('mobile_no').innerHTML += mobileValue;
+            
+            mob_first = mobileValue.slice(0,mobileValue.length-3);
+            mob_last = mobileValue.substr(mobileValue.length - 3);
         });
+        
+        var mobile = mob_first.replace(/./g, '*');
+        document.getElementById('mobile_no').innerHTML += mobile.concat(mob_last);
 	}
 
 	function errorCB(err) {
@@ -58,7 +69,7 @@ function verifyOTP(){
 	function successCB() {
  		//alert("success fetchEmployeeDetails SQL!");
 	}	
-	sendOTP();
+	//sendOTP();
 </script>
 </body>
 </html>
