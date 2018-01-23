@@ -33,7 +33,8 @@ $(document).ready(function(){
 		else
 		{
     		//alert('Can Apply confirmbtn Action:'+project_code);
-    		$.getJSON("https://sonalib.000webhostapp.com/PostCabRequest.php?emp_id="+$('#emp_id').val()+"&emp_name="+$('#emp_name').val()+"&project_code="+project_code+"&pickup_point="+$('#pickup_point').val()+"&drop_point="+$('#drop_point').val()+"&pickup_time="+$('#pickup_time').val()+"&manager_id="+manager_id+"&travel_date="+$('#travel_date').val(), function (data) {
+    		
+    		$.getJSON("https://sonalib.000webhostapp.com/PostCabRequest.php?emp_id="+emp_id+"&emp_name="+emp_name+"&project_code="+project_code+"&pickup_point="+pickup_point+"&drop_point="+drop_point+"&pickup_time="+pickup_time+"&manager_id="+manager_id+"&travel_date="+travel_date, function (data) {
     			alert('Cab request submitted successfully');
         		document.getElementById('pickup_point').value = "";
         		document.getElementById('drop_point').value = "";
@@ -44,6 +45,7 @@ $(document).ready(function(){
 			}).catch(function (jqXHR, textStatus, errorThrown) {
 				alert('Unable to process the request. Please try later.');
 			});
+			
 		}
     });
     //setInterval(function() {
@@ -80,8 +82,12 @@ function getManagerDetailsAPICall(employeeID)
 }
 
 	var db = window.openDatabase("CabRequest", "1.0", "Cab-request tool database", 1000000);
-	var emp_id,emp_name,department,area,pickup_point,mobile_no,pickup_time,manager_id,email,site_id,route_id,project_code;
+	var emp_id,emp_name,department,area,pickup_point,mobile_no,pickup_time,manager_id,email,travel_date,project_code,drop_point;
 	db.transaction(fetchEmployeeDetails, errorCB, successCB);
+	pickup_point = $('#pickup_point').val();
+		drop_point = $('#drop_point').val();
+		pickup_time = $('#pickup_time').val();
+	    travel_date	= $('#travel_date').val();
 	//alert("fetchEmployeeDetails !");
 	function fetchEmployeeDetails(tx){
     	tx.executeSql('SELECT * FROM user',[],querySuccess,errorCB);
@@ -98,10 +104,10 @@ function getManagerDetailsAPICall(employeeID)
                 manager_id = row['manager_id'];
                 project_code = row['project_code'];
         });
-        document.getElementById('emp_id').value = emp_id;
-        document.getElementById('emp_name').value = emp_name;
-        document.getElementById('department').value = department;
-        document.getElementById('mobile').value = mobile_no;
+       //  document.getElementById('emp_id').innerHTML = emp_id;
+//         document.getElementById('emp_name').innerHTML = emp_name;
+//         document.getElementById('department').innerHTML = department;
+//         document.getElementById('mobile').value = mobile_no;
 	}
 
 	function errorCB(err) {
@@ -109,9 +115,12 @@ function getManagerDetailsAPICall(employeeID)
 	}
 	function successCB() {
  		getManagerDetailsAPICall(manager_id);
+ 		
  		alert("success getManagerDetails SQL! with managr ID:"+manager_id);
 	}	
 </script>
+
+
 <script>
 function insertManagerData(data)
 {
@@ -126,13 +135,13 @@ function insertManagerData(data)
  		//alert("insertManagerData Error processing SQL: "+err.code+err.message);
  		if (err.code==6)
  		{
- 			document.getElementById('manager_name').value = data.emp_name;
+ 			//document.getElementById('manager_name').value = data.emp_name;
  		}
 	}
 
 	function successCB() {
  		//alert("insertManagerData success SQL!");
- 		document.getElementById('manager_name').value = data.emp_name;
+ 		//document.getElementById('manager_name').value = data.emp_name;
 	}
 }
 </script>
@@ -155,54 +164,45 @@ function pushNextScreen(theUrl)
 <div role="main" class="ui-content">
     <form>  
 	<table align="center">  
-	<tr>  
-    	<td class="tdLabel"><label for="emp_idlbl" class="label">Employee Id</label></td>  
-    	<td><input type="number" name="emp_id" value="" id="emp_id" style="width:240px" readonly="readonly"/></td>  
-	</tr>  
-
-	<tr>  
-    	<td class="tdLabel"><label for="name" class="label">Employee Name</label></td>  
-    	<td><input type="text" name="emp_name" id="emp_name" style="width:240px" readonly="readonly"/></td>  
-	</tr> 
- 
-	<tr>  
-	    <td class="tdLabel"><label for="dept" class="label">Department</label></td>  
-    	<td><input type="text" name="department" value="" id="department" style="width:240px" readonly="readonly"/></td>  
-	</tr>
-  
-	<tr>
-    	<td class="tdLabel"><label for="phone" class="label">Mobile Number</label></td>  
-    	<td><input type="number" name="mobile" id="mobile" style="width:240px"/></td>  
-	</tr>
-
+	
 	<tr>  
     	<td class="tdLabel"><label for="pickupPointlbl" class="label">Pickup Point</label></td>  
+    </tr>
+    <tr>
     	<td><input type="text" name="pickup_point" value="" id="pickup_point" style="width:240px"/></td>  
 	</tr>
      
 	<tr>  
-    	<td class="tdLabel"><label for="dropPointlbl" class="label">Drop Point</label></td>  
+    	<td class="tdLabel"><label for="dropPointlbl" class="label">Drop Point</label></td> 
+    </tr> 
+    <tr>
     	<td><input type="text" name="drop_point" value="" id="drop_point" style="width:240px"/></td>  
 	</tr>
   
 	<tr>  
-    	<td class="tdLabel"><label for="travelDatelbl" class="label">Travel Date</label></td>  
+    	<td class="tdLabel"><label for="travelDatelbl" class="label">Travel Date</label></td> 
+    </tr>
+    <tr> 
     	<td><input type="date" name="travel_date" value="" id="travel_date" style="width:240px" data-role="date"/></td>  
-	</tr>
-
-	<tr>  
-    	<td class="tdLabel"><label for="pickupTimelbl" class="label">Pickup Time</label></td>  
-    	<td><input type="time" name="pickup_time" value="" id="pickup_time" style="width:240px"/></td>
 	</tr>
 	<tr>  
     	<td class="tdLabel"><label for="loginTimelbl" class="label">Login Time</label></td>  
-    	<td><input type="time" name="login_time" value="" id="login_time" style="width:240px"/></td>
+    </tr>
+    <tr>
+    	<td><input type="text" name="login_time" value="" id="login_time" style="width:240px"/></td>  
 	</tr>
 	<tr>  
-    	<td class="tdLabel"><label for="managerNamelbl" class="label">Manager Name</label></td>  
-    	<td><input type="text" name="manager_name" value="" id="manager_name" style="width:240px"/></td>  
+    	<td class="tdLabel"><label for="pickupTimelbl" class="label">Pickup Time</label></td>  
+    </tr>
+    <tr>	
+    	<td><input type="time" name="pickup_time" value="" id="pickup_time" style="width:240px"/></td>
 	</tr>
-   
+	<tr>
+   <td class="tdLabel"><label for="commentlbl" class="label">Comments </label></td>
+   </tr>
+   <tr>
+    <td><textarea name="" id="comment" cols="45" rows="10"></textarea></td>
+   </tr>
 	<tr>  
     	<td colspan="2">
     	<div align="center"><input type="button" id="confirmbtn" value="Confirm"/></div>
